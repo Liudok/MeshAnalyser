@@ -10,6 +10,7 @@ find_package(Qt5 REQUIRED
     Gui
     Widgets
 	3DRender
+	3DExtras
 	openGL
 )
 
@@ -24,7 +25,7 @@ file(GLOB_RECURSE SOURCES
 	
 add_executable(MeshAnalyser WIN32 ${SOURCES})
 
-target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL)
+target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras)
 
 set_target_properties(MeshAnalyser PROPERTIES
 							AUTOMOC ON
