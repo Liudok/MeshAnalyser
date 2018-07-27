@@ -5,9 +5,9 @@
 
 struct Triangle
 {
-	size_t v1;
-	size_t v2;
-	size_t v3;
+	size_t v1 = 0;
+	size_t v2 = 0;
+	size_t v3 = 0;
 };
 
 struct Mesh
