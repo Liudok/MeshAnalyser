@@ -1,17 +1,24 @@
 #pragma once
 
 #include <QVector3D>
-#include <vector>
+#include <QVector>
+#include <QOpenGLWidget>
+#include <QMatrix4x4>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+#include <QOpenGLBuffer>
+#include <QMouseEvent>
+#include <QKeyEvent>
 
 struct Triangle
 {
-	size_t v1 = 0;
-	size_t v2 = 0;
-	size_t v3 = 0;
+	GLuint v1 = 0;
+	GLuint v2 = 0;
+	GLuint v3 = 0;
 };
 
 struct Mesh
 {
-	std::vector<QVector3D> vertices;
-	std::vector<Triangle> triangles;
+	QVector<QVector3D> vertices;
+	QVector<Triangle> triangles;
 };

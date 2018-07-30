@@ -3,10 +3,12 @@
 #include <QMessageBox>
 #include "ObjParser.h"
 #include <iostream>
-#include<string>
+#include "LogicLib/logic.h"
+
 
 int main(int argc, char *argv[])
 {
+	std::cout << mySum(10, 20) << std::endl;
 	QApplication a(argc, argv);
 
 	if (argc < 2)
