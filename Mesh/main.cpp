@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "ObjParser.h"
 #include <iostream>
-#include "LogicLib/logic.h"
+#include "../LogicLib/logic.h"
 
 
 int main(int argc, char *argv[])
