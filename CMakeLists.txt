@@ -17,11 +17,13 @@ find_package(Qt5 REQUIRED
 ADD_LIBRARY( MyStaticLib STATIC
              LogicLib/logic.cpp )
 
-file(GLOB_RECURSE SOURCES
+file(GLOB SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/*.qrc
-	${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
+	${CMAKE_CURRENT_SOURCE_DIR}/*.ui
+	${CMAKE_CURRENT_SOURCE_DIR}/LogicLib/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/LogicLib/*.hpp)
 	
 add_executable(MeshAnalyser WIN32 ${SOURCES})
 
