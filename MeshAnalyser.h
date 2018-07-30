@@ -40,9 +40,9 @@ class Ui::Widget : public QOpenGLWidget
 		QQuaternion m_rotation;
 
 	protected:
-		//void initializeGL();
-		//void resizeGL(int w, int h);
-		//void paintGL();
+		void initializeGL();
+		void resizeGL(int w, int h);
+		void paintGL();
 
 		//void mousePressEvent(QMouseEvent * event);
 		//void mouseMoveEvent(QMouseEvent * event);
