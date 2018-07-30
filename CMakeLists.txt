@@ -14,8 +14,8 @@ find_package(Qt5 REQUIRED
 	openGL
 )
 
-
-
+ADD_LIBRARY( MyStaticLib STATIC
+             LogicLib/logic.cpp )
 
 file(GLOB_RECURSE SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/*.cpp

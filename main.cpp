@@ -2,9 +2,11 @@
 #include <QtWidgets/QApplication>
 #include "ObjParser.h"
 #include <iostream>
+#include "LogicLib/logic.h"
 
 int main(int argc, char *argv[])
 {
+	std::cout << mySum(10, 20) << std::endl;
 	QApplication a(argc, argv);
 	MeshAnalyser w;
 	try {
