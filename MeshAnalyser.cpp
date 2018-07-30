@@ -1,22 +1,23 @@
 #include "MeshAnalyser.h"
 #include "Triangle.h"
 
+
+
 MeshAnalyser::MeshAnalyser(QWidget *parent)
 	: QMainWindow(parent), 
-	openGLWidget(new Ui::Widget(this))
+	openGLWidget(new Widget(this))
 {
-	
 	openGLWidget->setMinimumSize(400, 400);
 	ui.setupUi(this);
 }
 
-Ui::Widget::Widget(QWidget *parent) :
+Widget::Widget(QWidget *parent) :
 	QOpenGLWidget(parent),
 	m_texture(nullptr),
 	m_indexBuffer(QOpenGLBuffer::IndexBuffer){}
 
 
-void Ui::Widget::initializeGL()
+void Widget::initializeGL()
 	{
 	glClearColor(0.2f, 0.4f, 0.0f, 1.0f);
 
@@ -26,14 +27,14 @@ void Ui::Widget::initializeGL()
 	//initShaders();
 	}
 //
-void Ui::Widget::resizeGL(int w, int h)
+void Widget::resizeGL(int w, int h)
 	{
 	float aspect = w / static_cast<float>(h);
 	m_projectionMatrix.setToIdentity();
 	m_projectionMatrix.perspective(45, aspect, 0.1, 10);
 	}
 ////
-void Ui::Widget::paintGL()
+void Widget::paintGL()
 	{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

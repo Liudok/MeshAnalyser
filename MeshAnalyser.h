@@ -10,7 +10,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 
-
+class Widget;
 class MeshAnalyser : public QMainWindow
 {
 	Q_OBJECT
@@ -20,10 +20,10 @@ public:
 
 private:
 	Ui::MeshAnalyserClass ui;
-	Ui::Widget* openGLWidget;
+	Widget* openGLWidget;
 };
 
-class Ui::Widget : public QOpenGLWidget
+class Widget : public QOpenGLWidget
 	{
 	Q_OBJECT
 
