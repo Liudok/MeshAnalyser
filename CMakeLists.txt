@@ -14,18 +14,28 @@ find_package(Qt5 REQUIRED
 	openGL
 )
 
-ADD_LIBRARY( MyStaticLib STATIC
+ADD_LIBRARY( LogicLib STATIC
              LogicLib/logic.cpp )
 
-file(GLOB SOURCES
+file(GLOB MESHSOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh/*.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh/*.qrc
 	${CMAKE_CURRENT_SOURCE_DIR}/Mesh/*.ui)
-	
-add_executable(MeshAnalyser WIN32 ${SOURCES})
 
-target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras MyStaticLib)
+file(GLOB TESTSOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.qrc
+	${CMAKE_CURRENT_SOURCE_DIR}/Tests/*.ui)
+
+add_executable(MeshAnalyser WIN32 ${MESHSOURCES})
+
+add_executable(Tester ${TESTSOURCES})
+
+target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras LogicLib)
+
+target_link_libraries(Tester LogicLib)
 
 set_target_properties(MeshAnalyser PROPERTIES
 							AUTOMOC ON
