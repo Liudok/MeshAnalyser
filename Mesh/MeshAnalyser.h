@@ -103,8 +103,10 @@ class Widget : public QOpenGLWidget
 		void resizeGL(int w, int h);
 		void paintGL();
 
-		//void mousePressEvent(QMouseEvent * event);
-		//void mouseMoveEvent(QMouseEvent * event);
+		bool eventFilter(QObject *obj, QEvent *ev);
+
+		void mousePressEvent(QMouseEvent * event) override;
+		void mouseMoveEvent(QMouseEvent * event) override;
 
 		void initShaders();
 		//void initMesh(float width);

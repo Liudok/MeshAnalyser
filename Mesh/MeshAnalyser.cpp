@@ -22,6 +22,7 @@ void Widget::initializeGL()
 	f->glClearColor(0.2f, 0.4f, 0.0f, 1.0f);
 
 	f->glEnable(GL_DEPTH_TEST);
+	f->glEnable(GL_BLEND_COLOR);
 	f->glEnable(GL_CULL_FACE);
 
 	initShaders();
@@ -39,7 +40,7 @@ void Widget::resizeGL(int w, int h)
 void Widget::paintGL()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-	f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	GLfloat vertices[] = {
 		0.0f, 0.5f,
@@ -52,6 +53,14 @@ void Widget::paintGL()
 		0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 1.0f
 	};
+	QMatrix4x4 modelViewMatrix;
+	modelViewMatrix.setToIdentity();
+	modelViewMatrix.translate(0.0, 0.0, -1.0);
+	modelViewMatrix.rotate(m_rotation);
+	//	m_texture->bind(0);
+	m_program->bind();
+	m_program->setUniformValue("qt_ModelViewProjectionMatrix", m_projectionMatrix * modelViewMatrix);
+	//m_program->setUniformValue("qt_Texture0", 0);
 	GLuint m_posAttr = m_program->attributeLocation("posAttr");
 	GLuint m_colAttr = m_program->attributeLocation("colAttr");
 
@@ -66,33 +75,23 @@ void Widget::paintGL()
 	f->glDisableVertexAttribArray(0);
 
 	m_program->release();
+	
+	//m_arrayBuffer.bind();
 
-	QMatrix4x4 modelViewMatrix;
-	modelViewMatrix.setToIdentity();
-	modelViewMatrix.translate(0.0, 0.0, -1.0);
-	modelViewMatrix.rotate(m_rotation);
-	//	m_texture->bind(0);
+	//int offset = 0;
 
-	m_program->bind();
-	m_program->setUniformValue("qt_ModelViewProjectionMatrix", m_projectionMatrix * modelViewMatrix);
-	m_program->setUniformValue("qt_Texture0", 0);
-
-	m_arrayBuffer.bind();
-
-	int offset = 0;
-
-	int vertLoc = m_program->attributeLocation("qt_Vertex");
-	m_program->enableAttributeArray(vertLoc);
-	//m_program.setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(QVector3D));
+	//int vertLoc = m_program->attributeLocation("qt_Vertex");
+	//m_program->enableAttributeArray(vertLoc);
+	////m_program.setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(QVector3D));
 
 
-	m_program->setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(VertexData));
+	//m_program->setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-	offset += sizeof(QVector3D);
+	//offset += sizeof(QVector3D);
 
-	int texLoc = m_program->attributeLocation("qt_MultiTexCoord0");
-	m_program->enableAttributeArray(texLoc);
-	m_program->setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(VertexData));
+	//int texLoc = m_program->attributeLocation("qt_MultiTexCoord0");
+	//m_program->enableAttributeArray(texLoc);
+	//m_program->setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(VertexData));
 
 
 	/*	offset += sizeof(QVector3D);
@@ -101,47 +100,54 @@ void Widget::paintGL()
 		m_program.enableAttributeArray(texLoc);
 		m_program.setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(QVector3D));
 		*/
-	m_indexBuffer.bind();
+	//m_indexBuffer.bind();
 
-	f->glDrawElements(GL_TRIANGLES, m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+	//f->glDrawElements(GL_TRIANGLES, m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
 }
 //
-//void Widget::mousePressEvent(QMouseEvent *event)
-//	{
-//	if(event->buttons() == Qt::LeftButton)
-//		m_mousePosition = QVector2D(event->localPos());
-//	event->accept();
-//	}
-//
-//void Widget::mouseMoveEvent(QMouseEvent *event)
-//	{
-//	if(event->buttons() != Qt::LeftButton)
-//		return;
-//	QVector2D diff = QVector2D(event->localPos()) - m_mousePosition;
-//	m_mousePosition = QVector2D(event->localPos());
-//
-//	float angle = diff.length() / 2.0;
-//
-//	QVector3D axis = QVector3D(diff.y(), diff.x(), 0.0);
-//
-//	m_rotation = QQuaternion::fromAxisAndAngle(axis, angle) * m_rotation;
-//
-//	update();
-//
-//	}
-//
+
+bool Widget::eventFilter(QObject *obj, QEvent *ev)
+{
+	if (ev->type() == QEvent::MouseButtonPress)
+		mousePressEvent(dynamic_cast<QMouseEvent *>(ev));
+	return true;
+}
+
+void Widget::mousePressEvent(QMouseEvent *event)
+	{
+	if(event->buttons() == Qt::LeftButton)
+		m_mousePosition = QVector2D(event->localPos());
+	event->accept();
+	}
+
+void Widget::mouseMoveEvent(QMouseEvent *event)
+	{
+	if(event->buttons() != Qt::LeftButton)
+		return;
+	QVector2D diff = QVector2D(event->localPos()) - m_mousePosition;
+	m_mousePosition = QVector2D(event->localPos());
+
+	float angle = diff.length() / 2.0;
+
+	QVector3D axis = QVector3D(diff.y(), diff.x(), 0.0);
+
+	m_rotation = QQuaternion::fromAxisAndAngle(axis, angle) * m_rotation;
+
+	update();
+
+	}
+
 void Widget::initShaders()
 {
 	m_program = new QOpenGLShaderProgram(this);
-	
+
 	const char *vshader = "attribute highp vec4 posAttr; attribute lowp vec4 colAttr;\
 attribute highp vec4 qt_Vertex; attribute highp vec2 qt_MultiTexCoord0; uniform highp mat4 qt_ModelViewProjectionMatrix;\
 varying lowp vec4 col;\
 	varying highp vec2 qt_TexCoord0;void main(void)\
 	{\
 		col = colAttr;\
-		gl_Position = qt_ModelViewProjectionMatrix * qt_Vertex;\
-		qt_TexCoord0 = qt_MultiTexCoord0;\
+		gl_Position = qt_ModelViewProjectionMatrix * posAttr;\
 	}";
 	m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vshader);
 	const char *fshader = "uniform sampler2D qt_Texture0;\
