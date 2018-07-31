@@ -13,6 +13,9 @@ find_package(Qt5 REQUIRED
 	3DExtras
 	openGL
 )
+find_package(OpenGL REQUIRED)
+
+include_directories( ${OPENGL_INCLUDE_DIRS})
 
 ADD_LIBRARY( LogicLib STATIC
              LogicLib/logic.cpp )
@@ -33,7 +36,7 @@ add_executable(MeshAnalyser WIN32 ${MESHSOURCES})
 
 add_executable(Tester ${TESTSOURCES})
 
-target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras LogicLib)
+target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras LogicLib ${OPENGL_LIBRARIES}) 
 
 target_link_libraries(Tester LogicLib)
 
