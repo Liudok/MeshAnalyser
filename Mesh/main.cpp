@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
 	MeshAnalyser w;
 	try {
-		Mesh ourMesh = parseObjFile(argv[1]);
+		w.setMesh(parseObjFile(argv[1]));
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
