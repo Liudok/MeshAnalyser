@@ -12,6 +12,12 @@ find_package(Qt5 REQUIRED
 	3DRender
 	3DExtras
 	openGL
+	3DCore
+	3DInput
+	3DLogic
+	Concurrent
+	Gamepad
+	Network
 )
 
 find_package(OpenGL REQUIRED)
@@ -37,11 +43,13 @@ add_executable(MeshAnalyser WIN32 ${MESHSOURCES})
 
 add_executable(Tester ${TESTSOURCES})
 
-target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras LogicLib ${OPENGL_LIBRARIES}) 
+target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras
+	Qt5::3DCore Qt5::3DInput Qt5::3DLogic Qt5::Concurrent Qt5::Gamepad Qt5::Network LogicLib ${OPENGL_LIBRARIES}) 
 
 target_link_libraries(Tester LogicLib)
 
-target_link_libraries(LogicLib Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras)
+target_link_libraries(LogicLib Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras
+	Qt5::3DCore Qt5::3DInput Qt5::3DLogic Qt5::Concurrent Qt5::Gamepad Qt5::Network)
 
 set_target_properties(MeshAnalyser PROPERTIES
 							AUTOMOC ON
@@ -63,7 +71,27 @@ add_custom_command(TARGET MeshAnalyser
 
 			   COMMAND    ${CMAKE_COMMAND}
     		   ARGS       -E copy $<TARGET_FILE:Qt5::3DRender> $<TARGET_FILE_DIR:MeshAnalyser>
-
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::3DExtras> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::3DCore> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::3DInput> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::3DLogic> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::Concurrent> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::Gamepad> $<TARGET_FILE_DIR:MeshAnalyser>
+			   
+			   COMMAND    ${CMAKE_COMMAND}
+    		   ARGS       -E copy $<TARGET_FILE:Qt5::Network> $<TARGET_FILE_DIR:MeshAnalyser>
 
     		   COMMAND    ${CMAKE_COMMAND}
     		   ARGS       -E make_directory $<TARGET_FILE_DIR:MeshAnalyser>/platforms
