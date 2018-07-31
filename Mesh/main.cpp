@@ -1,7 +1,6 @@
 #include "MeshAnalyser.h"
 #include <QtWidgets/QApplication>
 #include <QMessageBox>
-#include "ObjParser.h"
 #include <iostream>
 #include "../LogicLib/logic.h"
 
