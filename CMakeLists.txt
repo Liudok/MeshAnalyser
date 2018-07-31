@@ -13,6 +13,7 @@ find_package(Qt5 REQUIRED
 	3DExtras
 	openGL
 )
+
 find_package(OpenGL REQUIRED)
 
 include_directories( ${OPENGL_INCLUDE_DIRS})
@@ -39,6 +40,8 @@ add_executable(Tester ${TESTSOURCES})
 target_link_libraries(MeshAnalyser Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras LogicLib ${OPENGL_LIBRARIES}) 
 
 target_link_libraries(Tester LogicLib)
+
+target_link_libraries(LogicLib Qt5::Widgets Qt5::Core Qt5::3DRender Qt5::OpenGL Qt5::3DExtras)
 
 set_target_properties(MeshAnalyser PROPERTIES
 							AUTOMOC ON
