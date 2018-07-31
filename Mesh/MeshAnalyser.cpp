@@ -41,7 +41,31 @@ void Widget::paintGL()
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	GLfloat vertices[] = {
+		0.0f, 0.5f,
+		-0.5f, -0.5f,
+		0.5f, -0.5f
+	};
 
+	GLfloat colors[] = {
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
+	GLuint m_posAttr = m_program->attributeLocation("posAttr");
+	GLuint m_colAttr = m_program->attributeLocation("colAttr");
+
+	f->glVertexAttribPointer(m_posAttr, 2, GL_FLOAT, GL_FALSE, 0, vertices);
+	f->glVertexAttribPointer(m_colAttr, 3, GL_FLOAT, GL_FALSE, 0, colors);
+	f->glEnableVertexAttribArray(0);
+	f->glEnableVertexAttribArray(1);
+
+	f->glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	f->glDisableVertexAttribArray(1);
+	f->glDisableVertexAttribArray(0);
+
+	m_program->release();
 
 	QMatrix4x4 modelViewMatrix;
 	modelViewMatrix.setToIdentity();
@@ -109,18 +133,24 @@ void Widget::paintGL()
 void Widget::initShaders()
 {
 	m_program = new QOpenGLShaderProgram(this);
-	const char *vshader = "attribute highp vec4 qt_Vertex; attribute highp vec2 qt_MultiTexCoord0; uniform highp mat4 qt_ModelViewProjectionMatrix;\
+	
+	const char *vshader = "attribute highp vec4 posAttr; attribute lowp vec4 colAttr;\
+attribute highp vec4 qt_Vertex; attribute highp vec2 qt_MultiTexCoord0; uniform highp mat4 qt_ModelViewProjectionMatrix;\
+varying lowp vec4 col;\
 	varying highp vec2 qt_TexCoord0;void main(void)\
 	{\
+		col = colAttr;\
 		gl_Position = qt_ModelViewProjectionMatrix * qt_Vertex;\
 		qt_TexCoord0 = qt_MultiTexCoord0;\
 	}";
 	m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vshader);
 	const char *fshader = "uniform sampler2D qt_Texture0;\
+varying lowp vec4 col;\
 		varying highp vec2 qt_TexCoord0;\
 	void main(void)\
 	{\
 		gl_FragColor = texture2D(qt_Texture0, qt_TexCoord0);\
+		gl_FragColor = col;\
 	}";
 	m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fshader);
 	m_program->link();
