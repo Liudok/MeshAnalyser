@@ -22,7 +22,6 @@ public:
 	void setPosition(const QVector3D &position);
 	void setViewCenter(const QVector3D &viewCenter);
 	void setViewMatrix(const QMatrix4x4 &view);
-	
 private:
 	QVector3D m_position;
 	QVector3D m_viewCenter;
