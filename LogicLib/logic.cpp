@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <regex>
+#include <vector>
 
 namespace
 {
@@ -38,4 +39,47 @@ Mesh parseObjFile(const char* fileName)
 			result.triangles.push_back(parseTriangle(line, result.vertices.size()));
 	}
 	return result;
+}
+
+namespace
+{
+	bool nearlyEqual(float a, float b)
+	{
+		const auto epsilon = 10e-6;
+		return std::abs(a - b) < epsilon;
+	}
+
+	bool pointsIntersect(QVector3D const& p1, QVector3D const& p2)
+	{
+		return nearlyEqual(p1.x(), p2.x()) &&
+			nearlyEqual(p1.y(), p2.y());
+	}
+
+	int findClosestToViewerPointIndex(QVector<QVector3D> const& vertices,
+		std::vector<int> const& intersectingPointsIndices)
+	{
+		const int notFound = -1;
+		if (intersectingPointsIndices.empty()) return notFound;
+		float minZ = std::numeric_limits<float>::max();
+		int bestPointIndex = 0;
+		for (auto index : intersectingPointsIndices) {
+			if (vertices[index].z() < minZ) {
+				minZ = vertices[index].z();
+				bestPointIndex = index;
+			}
+		}
+		return bestPointIndex;
+	}
+}
+
+int findIndexOfVertexPointedAt(QVector<QVector3D> const& vertices,
+	QVector3D const& click)
+{
+	if (vertices.size() > std::numeric_limits<int>::max())
+		throw std::runtime_error("The vector contains to many points");
+	std::vector<int> intersectingPointsIndices;
+	for (int i = 0; i < vertices.size(); ++i)
+		if (pointsIntersect(vertices[i], click))
+			intersectingPointsIndices.push_back(i);
+	return findClosestToViewerPointIndex(vertices, intersectingPointsIndices);
 }
