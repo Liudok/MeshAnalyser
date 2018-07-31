@@ -88,10 +88,13 @@ private:
 	QMatrix4x4 m_matrixProjection;
 	QMatrix4x4 m_matrixMVP;
 
+	QMatrix4x4 m_cameraStart;
 	QPoint m_mouseStart;
 
 	QOpenGLShaderProgram *m_program;
 	int m_frame;
+
+	int m_mouseButton;
 
 	bool m_mousePressed;
 
@@ -164,6 +167,7 @@ void TriangleWindow::initialize()
 	m_matrixModel.setToIdentity();
 	m_matrixModel.scale(0.1);
 	m_camera = new Camera(QVector3D(0, 0, 1), QVector3D(0, 0, 0), QVector3D(0, -1, 0));
+	m_mousePressed = false;
 }
 //! [4]
 
@@ -223,22 +227,28 @@ void TriangleWindow::mousePressEvent(QMouseEvent *ev)
 {
 	m_mousePressed = true;
 	m_mouseStart = ev->pos();
+	m_cameraStart = m_camera->getViewMatrix();
+	m_mouseButton = 2;
 }
 
 void TriangleWindow::mouseMoveEvent(QMouseEvent *ev)
 {
-	if (m_mousePressed && (ev->button() == Qt::MouseButton::RightButton))
+	if (m_mousePressed && m_mouseButton == 2)
 	{
 		QPoint delta = ev->pos() - m_mouseStart;
+
 		QMatrix4x4 translate;
 		translate.setToIdentity();
-		translate.translate(QVector3D(delta.x(), delta.y(), 0));
-		QVector3D newPos = translate * m_camera->getPosition();
-		m_camera->setPosition(newPos);
+		translate.translate(QVector3D(delta.x() / 800.0, -delta.y() / 600.0, 0));
+
+		QMatrix4x4 newView = translate*m_cameraStart;
+
+		m_camera->setViewMatrix(newView);
 	}
 }
 
 void TriangleWindow::mouseReleaseEvent(QMouseEvent *ev)
 {
 	m_mousePressed = false;
+	m_mouseButton = 0;
 }
