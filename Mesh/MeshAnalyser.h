@@ -93,7 +93,7 @@ class Widget : public QOpenGLWidget
 		QOpenGLTexture *m_texture;
 		QOpenGLBuffer m_indexBuffer;
 		QMatrix4x4 m_projectionMatrix;
-		QOpenGLShaderProgram m_program;
+		QOpenGLShaderProgram *m_program;
 		QOpenGLBuffer m_arrayBuffer;
 		QVector2D m_mousePosition;
 		QQuaternion m_rotation;

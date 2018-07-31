@@ -1,8 +1,9 @@
 #include "MeshAnalyser.h"
 #include <QGLShader>
+#include <qopenglfunctions.h>
 
 MeshAnalyser::MeshAnalyser(QWidget *parent)
-	: QMainWindow(parent), 
+	: QMainWindow(parent),
 	openGLWidget(new Widget(this))
 {
 	openGLWidget->setMinimumSize(400, 400);
@@ -12,73 +13,74 @@ MeshAnalyser::MeshAnalyser(QWidget *parent)
 Widget::Widget(QWidget *parent) :
 	QOpenGLWidget(parent),
 	m_texture(nullptr),
-	m_indexBuffer(QOpenGLBuffer::IndexBuffer){}
+	m_indexBuffer(QOpenGLBuffer::IndexBuffer) {}
 
 
 void Widget::initializeGL()
 {
-	glClearColor(0.2f, 0.4f, 0.0f, 1.0f);
+	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+	f->glClearColor(0.2f, 0.4f, 0.0f, 1.0f);
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	
+	f->glEnable(GL_DEPTH_TEST);
+	f->glEnable(GL_CULL_FACE);
+
 	initShaders();
 	initCube(0.30f);
 
-	
 }
 
 void Widget::resizeGL(int w, int h)
-	{
+{
 	float aspect = w / static_cast<float>(h);
 	m_projectionMatrix.setToIdentity();
 	m_projectionMatrix.perspective(45, aspect, 0.1, 10);
-	}
+}
 
 void Widget::paintGL()
-	{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+{
+	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+	f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
 	QMatrix4x4 modelViewMatrix;
 	modelViewMatrix.setToIdentity();
 	modelViewMatrix.translate(0.0, 0.0, -1.0);
 	modelViewMatrix.rotate(m_rotation);
+	//	m_texture->bind(0);
 
-//	m_texture->bind(0);
-
-	m_program.bind();
-	
-	m_program.setUniformValue("qt_ModelViewProjectionMatrix", m_projectionMatrix * modelViewMatrix);
-	m_program.setUniformValue("qt_Texture0", 0);
+	m_program->bind();
+	m_program->setUniformValue("qt_ModelViewProjectionMatrix", m_projectionMatrix * modelViewMatrix);
+	m_program->setUniformValue("qt_Texture0", 0);
 
 	m_arrayBuffer.bind();
 
 	int offset = 0;
 
-	int vertLoc = m_program.attributeLocation("qt_Vertex");
-	m_program.enableAttributeArray(vertLoc);
+	int vertLoc = m_program->attributeLocation("qt_Vertex");
+	m_program->enableAttributeArray(vertLoc);
 	//m_program.setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(QVector3D));
 
-	
-	 m_program.setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    offset += sizeof(QVector3D);
+	m_program->setAttributeBuffer(vertLoc, GL_FLOAT, offset, 3, sizeof(VertexData));
 
-    int texLoc = m_program.attributeLocation("qt_MultiTexCoord0");
-    m_program.enableAttributeArray(texLoc);
-    m_program.setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(VertexData));
-	
+	offset += sizeof(QVector3D);
 
-/*	offset += sizeof(QVector3D);
+	int texLoc = m_program->attributeLocation("qt_MultiTexCoord0");
+	m_program->enableAttributeArray(texLoc);
+	m_program->setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(VertexData));
 
-	int texLoc = m_program.attributeLocation("qt_MultiTexCoord0");
-	m_program.enableAttributeArray(texLoc);
-	m_program.setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(QVector3D));
-	*/
+
+	/*	offset += sizeof(QVector3D);
+
+		int texLoc = m_program.attributeLocation("qt_MultiTexCoord0");
+		m_program.enableAttributeArray(texLoc);
+		m_program.setAttributeBuffer(texLoc, GL_FLOAT, sizeof(QVector3D), 2, sizeof(QVector3D));
+		*/
 	m_indexBuffer.bind();
 
-	glDrawElements(GL_TRIANGLES, m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
-	}
+	f->glDrawElements(GL_TRIANGLES, m_indexBuffer.size(), GL_UNSIGNED_INT, 0);
+}
 //
 //void Widget::mousePressEvent(QMouseEvent *event)
 //	{
@@ -105,32 +107,32 @@ void Widget::paintGL()
 //	}
 //
 void Widget::initShaders()
-	{
-
-const char *vshader = "attribute highp vec4 qt_Vertex; attribute highp vec2 qt_MultiTexCoord0; uniform highp mat4 qt_ModelViewProjectionMatrix;\
+{
+	m_program = new QOpenGLShaderProgram(this);
+	const char *vshader = "attribute highp vec4 qt_Vertex; attribute highp vec2 qt_MultiTexCoord0; uniform highp mat4 qt_ModelViewProjectionMatrix;\
 	varying highp vec2 qt_TexCoord0;void main(void)\
 	{\
 		gl_Position = qt_ModelViewProjectionMatrix * qt_Vertex;\
 		qt_TexCoord0 = qt_MultiTexCoord0;\
 	}";
-m_program.addShaderFromSourceCode(QOpenGLShader::Vertex, vshader);
-const char *fshader = "uniform sampler2D qt_Texture0;\
+	m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vshader);
+	const char *fshader = "uniform sampler2D qt_Texture0;\
 		varying highp vec2 qt_TexCoord0;\
 	void main(void)\
 	{\
 		gl_FragColor = texture2D(qt_Texture0, qt_TexCoord0);\
 	}";
-m_program.addShaderFromSourceCode(QOpenGLShader::Fragment, fshader);
-m_program.link();
+	m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fshader);
+	m_program->link();
 
 
-//	if(!m_program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.vsh"))
-//		close();
-//	if(!m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.fsh"))
-//		close();
-//	if(!m_program.link())
-//		close();
-	}
+	//	if(!m_program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/vshader.vsh"))
+	//		close();
+	//	if(!m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/fshader.fsh"))
+	//		close();
+	//	if(!m_program.link())
+	//		close();
+}
 //
 //void Widget::initMesh(float width)
 //	{
